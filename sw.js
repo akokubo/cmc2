@@ -1,22 +1,53 @@
-self.addEventListener('fetch', () => {
-  // ここは空でもOK
-})
+var cacheName = 'cmc2';
 
-// ファイブラリのインポート
-importScripts('https://storage.googleapis.com/workbox-cdn/releases/6.2.0/workbox-sw.js')
+var filesToCache = [
+    '/cmc2',
+    '/cmc2/about.html',
+    '/cmc2/apple-touch-icon.png',
+    '/cmc2/bootstrap.min.css',
+    '/cmc2/bootstrap.min.js',
+    '/cmc2/confusion-matrix-calculator.js',
+    '/cmc2/favicon.ico',
+    '/cmc2/icon-192x192.png',
+    '/cmc2/icon-512x512.png',
+    '/cmc2/index.html',
+    '/cmc2/jquery-3.5.1.slim.min.js',
+    '/cmc2/maskable_icon_x192.png',
+    '/cmc2/maskable_icon_x512.png',
+    '/cmc2/popper.min.js',
+    '/cmc2/style.css'
+];
 
-// ファイルのキャッシュ
-workbox.precaching.precacheAndRoute([
-  {
-    url: '/cmc/index.html',
-    revision: '12345'
-  },
-  {
-    url: '/cmc/bootstrap.min.css',
-    revision: '12345'
-  },
-  {
-  url: '/cmc/confusion-matrix-calculator.js',
-    revision: '12345'
-  },
-])
+self.addEventListener('install', function(event) {
+  console.log('ServiceWorker installing');
+  event.waitUntil(
+    caches.open(cacheName).then(function(cache) {
+      console.log('Service Worker caching app shell');
+      return cache.addAll(filesToCache);
+    })
+  );
+});
+
+self.addEventListener('activate', function(event) {
+  console.log('Service Worker activating');
+  event.waitUntil(
+    caches.keys().then(function(keyList) {
+      return Promise.all(keyList.map(function(key) {
+        if (key !== cacheName) {
+          console.log('Service Worker removing old cache', key);
+          return caches.delete(key);
+        }
+      }));
+    })
+  );
+  return self.clients.claim();
+});
+
+self.addEventListener('fetch', function(event) {
+  console.log('Service Worker fetching ', event.request.url);
+  event.respondWith(
+    caches.match(event.request).then(function(response) {
+      return response || fetch(event.request);
+    })
+  );
+});
