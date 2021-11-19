@@ -1,26 +1,26 @@
 {
-    "name":"Confusion Matrix Calculator",
-    "short_name":"CMC",
+    "name":"Confusion Matrix Calculator2",
+    "short_name":"CMC2",
     "icons": [{
-        "src": "/cmc/icon-192x192.png",
+        "src": "/cmc2/icon-192x192.png",
         "sizes":"192x192",
         "type": "image/png"
     },{
-        "src": "/cmc/maskable_icon_x192.png",
+        "src": "/cmc2/maskable_icon_x192.png",
         "sizes":"192x192",
         "type": "image/png",
         "purpose": "any maskable"
     }, {
-        "src": "cmc/icon-512x512.png",
+        "src": "cmc2/icon-512x512.png",
         "sizes":"512x512",
         "type": "image/png"
     }, {
-        "src": "/cmc/maskable_icon_x512.png",
+        "src": "/cmc2/maskable_icon_x512.png",
         "sizes":"512x512",
         "type": "image/png",
         "purpose": "any maskable"
     }],
-    "start_url": "/cmc/index.html?utm_source=homescreen",
+    "start_url": "/cmc2/index.html?utm_source=homescreen",
     "display": "standalone",
     "background_color": "#007bff",
     "theme_color": "#007bff"
