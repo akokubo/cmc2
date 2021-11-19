@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="bootstrap.min.css">
+    <link rel="stylesheet" href="style.css">
+    <title>混同行列計算アプリ</title>
+
+    <!-- アドレスバー等のブラウザのUIを非表示 -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <!-- ステータスバーの形式；default→Safariと同じ / black→黒 / black-translucent→コンテンツに含める -->
+    <meta name="apple-mobile-web-app-status-bar-style" content="black">
+    <!-- ホーム画面に表示されるアプリ名 -->
+    <meta name="apple-mobile-web-app-title" content="Counter">
+    <!-- ホーム画面に表示されるアプリアイコン -->
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+    <!-- アドレスバーの色を設定 -->
+    <meta name="theme-color" content="#007bff">
+    <!-- ウェブアプリマニフェストの読み込み -->
+    <link rel="manifest" href="manifest.json">
+
+    <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js')
+        .then((reg) => console.log('Service worker registered.', reg))
+    }
+    </script>
+
+      
+  </head>
+  <body  class="d-flex flex-column h-100" >
+    <a id="skippy" class="sr-only sr-only-focusable" href="#content">
+      <div class="container">
+        <span class="skiplink-text">メインコンテンツへスキップ</span>
+      </div>
+    </a>
+
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="index.html">混同行列計算アプリ</a>
+      </nav>
+    </header>
+
+    <header>
+      <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+        <a class="navbar-brand" href="index.html">混同行列計算アプリ</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarCollapse">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item active">
+              <a class="nav-link" href="./">ホーム <span class="sr-only">（現在位置）</span></a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="about.html">アプリについて</a>
+            </li>
+          </ul>
+        </div>
+      </nav>
+    </header>
+
+    <main role="main" class="flex-shrink-0" id="content">
+      <div class="container">
+        <h1 class="mt-5">混同行列を計算してみよう</h1>
+        <p class="lead">感染症などの検査で、どれだけ正しい結果が出るのか、混同行列で見てみましょう。検査の性能(感度、特異度)はオプションで変更できます。計算したい検査に合わせて変更してください。</p>
+      </div>
+      <div class="container">
+        <form method="post" action="#">
+          <fieldset>
+            <legend>人数の想定</legend>
+            <div class="form-group">
+              <label class="col-form-label" for="total">検査する人数</label>
+              <input type="number" class="form-control" id="total" name="total" value="300" min="0">
+              <small>検査する人数を指定します</small>
+            </div>
+            <div class="form-group">
+              <label class="col-form-label" for="infected">罹っている人数</label>
+              <input type="number" class="form-control" id="infected" name="infected" value="30" min="0">
+              <small>検査する人のうち何人が罹っていると想定するかを指定します</small>
+          </div>
+          </fieldset>
+          <div class="form-group">
+            <input type="submit" class="btn btn-primary" id="recalc" value="再計算">
+            <!-- Button trigger modal -->
+            <button type="button" class="btn btn-secondary" data-toggle="modal" data-target="#optionModal">オプション</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="modal fade" id="optionModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h5 class="modal-title" id="exampleModalLabel">オプション</h5>
+              <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+              </button>
+            </div>
+            <div class="modal-body">
+                        <fieldset>
+                  <legend>検査の性能</legend>
+                  <div class="form-group">
+                    <label class="col-form-label" for="sensitivity">感度(%)</label>
+                    <input type="number" class="form-control" id="sensitivity" name="sensitivity" value="70" max="100" min="0" step="0.1">
+                    <small>実際に罹っている人のうち、何%が検査で正しく陽性と出るかを指定します</small>
+                 </div>
+                  <div class="form-group">
+                   <label class="col-form-label" for="specificity">特異度(%)</label>
+                    <input type="number" class="form-control" id="specificity" name="specificity" value="99.9" max="100" min="0" step="0.1">
+                    <small>実際には罹っていない人のうち、何%が検査で正しく陰性と出るかを指定します</small>
+                  </div>
+                </fieldset>
+              </form>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-secondary" data-dismiss="modal">キャンセル</button>
+              <button type="button" class="btn btn-primary" id="apply-option">適用</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <h2 class="mt-5">混同行列</h2>
+        <table class="table table-bordered">
+          <tr>
+            <th colspan="2" rowspan="2" scope="col"></th>
+            <th colspan="2" scope="col" style="text-align: center;">検査結果</th>
+          </tr>
+          <tr>
+            <th scope="col" style="text-align: center;">陽性</th>
+            <th scope="col" style="text-align: center;">陰性</th>
+          </tr>
+          <tr>
+            <th rowspan="2" scope="row" style="text-align: center; vertical-align: middle;">実際</th>
+            <th scope="row" style="text-align: center;">罹っている</th>
+            <td class="table-info" style="text-align: right;"><span id="true-positive">21</span>人</td>
+            <td class="table-danger" style="text-align: right;"><span id="false-negative">9</span>人</td>
+          </tr>
+          <tr>
+            <th scope="row" style="text-align: center;">罹っていない</th>
+            <td class="table-danger" style="text-align: right;"><span id="false-positive">0.3</span>人</td>
+            <td class="table-info" style="text-align: right;"><span id="true-negative">269.7</span>人</td>
+          </tr>
+        </table>
+        <p class="h3 mt-3">適合率: <span id="precision">98.5</span>%</p>
+        <p><small>検査で陽性と出た人のうち、実際に罹っている人の割合</small></p>
+      </div>
+    </main>
+
+    <footer class="footer mt-auto py-3">
+      <nav class="navbar navbar-expand-md navbar-dark bg-dark fixed-bottom">
+        <span class="text-white">八戸工業大学 小久保温研究室</span>
+      </nav>
+    </footer>
+
+    <script src="jquery-3.5.1.slim.min.js"></script>
+    <script src="popper.min.js"></script>
+    <script src="bootstrap.min.js"></script>
+    <script src="confusion-matrix-calculator.js"></script>
+  </body>
+</html>
